@@ -1,7 +1,12 @@
 [alias]
 
-	# View abbreviated SHA, description, and history graph of the latest 20 commits
-	l = log --pretty=oneline -n 20 --graph --abbrev-commit
+	l = log --graph --all --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %an, %ar%Creset'
+
+	ll = log --stat --abbrev-commit
+
+	lg = log --color --graph --pretty=format:'%C(bold white)%h%Creset -%C(bold green)%d%Creset %s %C(bold green)(%cr)%Creset %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+
+	llg = log --color --graph --pretty=format:'%C(bold white)%H %d%Creset%n%s%n%+b%C(bold blue)%an <%ae>%Creset %C(bold green)%cr (%ci)' --abbrev-commit
 
 	# View the current working tree status using the short format
 	s = status -s
@@ -16,7 +21,7 @@
 	p = !"git pull; git submodule foreach git pull origin master"
 
 	# Clone a repository including all submodules
-	c = clone --recursive
+	#c = clone --recursive
 
 	# Commit all changes
 	ca = !git add -A && git commit -av
@@ -59,16 +64,7 @@
 
 	# List contributors with number of commits
 	contributors = shortlog --summary --numbered
-	lg = log --color --decorate --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an (%G?)>%Creset' --abbrev-commit
 	mdiff = "!f() { git stash | head -1 | grep -q 'No local changes to save'; x=$?; git merge --no-commit $1 &>/dev/null; git add -u &>/dev/null; git diff --staged; git reset --hard &>/dev/null; test $x -ne 0 && git stash pop &>/dev/null; }; f"
-
-	# Codereview aliases
-	change = codereview change
-	gofmt = codereview gofmt
-	mail = codereview mail
-	pending = codereview pending
-	submit = codereview submit
-	sync = codereview sync
 
 [apply]
 
@@ -89,13 +85,20 @@
 	# Make `git rebase` safer on OS X
 	# More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
 	trustctime = false
-	editor = vim
+	editor = atom --wait
+	legacyheaders = false # >git 1.5
+	quotepath = false
+
+	# http://stackoverflow.com/questions/136178/git-diff-handling-long-lines
+	pager = less -r
+	# if ↑ doesn’t work, try: pager = less -+$LESS -FRX
 
 [color]
 
 	# Use colors in Git commands that are capable of colored output when
 	# outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
 	ui = auto
+	interactive = auto
 
 [color "branch"]
 
@@ -120,6 +123,19 @@
 
 	# Detect copies as well as renames
 	renames = copies
+	tool = kdiff3
+
+[diff "exif"]
+
+	textconv = exif
+
+[difftool]
+
+	prompt = false
+
+[difftool "kdiff3"]
+
+	path = /Applications/kdiff3.app/Contents/MacOS/kdiff3
 
 [help]
 
@@ -130,13 +146,22 @@
 
 	# Include summaries of merged commits in newly created merge commit messages
 	log = true
+	tool = kdiff3
+
+[mergetool]
+
+	keepBackup = false
+
+[mergetool "kdiff3"]
+
+	path = /Applications/kdiff3.app/Contents/MacOS/kdiff3
 
 [push]
 
 	# Use the Git 1.x.x default to avoid errors on machines with old Git
 	# installations. To use `simple` instead, add this to your `~/.extra` file:
 	# `git config --global push.default simple`. See http://git.io/mMah-w.
-	default = matching
+	default = simple
 
 # URL shorthands
 [url "git@github.com:"]
@@ -159,16 +184,44 @@
 
 	insteadOf = "gist:"
 [user]
-	name = Jess Frazelle
-	email = me@jessfraz.com
-	signingkey = 0x18F3685C0022BFF3
-#[remote "origin"]
-	#fetch = +refs/pull/*/head:refs/remotes/origin/pull/*
+
+	name = alexhokl
+	email = alexhokl@gmail.com
+	signingkey = 7E320206
+
 [github]
-	user = jfrazelle
-#[init]
-#	templatedir = ~/.git_template/template
+
+	user = alexhokl
+
 [commit]
+
 	gpgsign = true
-[http]
-	cookiefile = /home/jessie/.gitcookies
+
+[filter "media"]
+
+	required = true
+	clean = git media clean %f
+	smudge = git media smudge %f
+
+[filter "hawser"]
+
+	clean = git hawser clean %f
+	smudge = git hawser smudge %f
+	required = true
+
+[filter "lfs"]
+
+	clean = git lfs clean %f
+	smudge = git lfs smudge %f
+	required = true
+
+[repack]
+
+	usedeltabaseoffset = true # >git 1.5
+
+[include]
+
+	# as of 1.7.10 https://github.com/git/git/commit/9b25a0b52e09400719366f0a33d0d0da98bbf7b0
+	path = ~/.gitcinclude
+	path = .githubconfig
+	path = .gitcredential

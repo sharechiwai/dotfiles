@@ -199,26 +199,6 @@ getcertnames() {
 	fi
 }
 
-# `v` with no arguments opens the current directory in Vim, otherwise opens the
-# given location
-v() {
-	if [ $# -eq 0 ]; then
-		vim .
-	else
-		vim "$@"
-	fi
-}
-
-# `o` with no arguments opens the current directory, otherwise opens the given
-# location
-o() {
-	if [ $# -eq 0 ]; then
-		xdg-open .	> /dev/null 2>&1
-	else
-		xdg-open "$@" > /dev/null 2>&1
-	fi
-}
-
 # `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
 # the `.git` directory, listing directories first. The output gets piped into
 # `less` with options to preserve color and line numbers, unless the output is
@@ -378,32 +358,45 @@ golistdeps(){
 	)
 }
 
-# get the name of a x window
-xname(){
-	local window_id=$1
-
-	if [[ -z $window_id ]]; then
-		echo "Please specifiy a window id, you find this with 'xwininfo'"
-
-		return 1
-	fi
-
-	local match_string='".*"'
-	local match_int='[0-9][0-9]*'
-	local match_qstring='"[^"\\]*(\\.[^"\\]*)*"' # NOTE: Adds 1 backreference
-
-	# get the name
-	xprop -id $window_id | \
-		sed -nr \
-		-e "s/^WM_CLASS\(STRING\) = ($match_qstring), ($match_qstring)$/instance=\1\nclass=\3/p" \
-		-e "s/^WM_WINDOW_ROLE\(STRING\) = ($match_qstring)$/window_role=\1/p" \
-		-e "/^WM_NAME\(STRING\) = ($match_string)$/{s//title=\1/; h}" \
-		-e "/^_NET_WM_NAME\(UTF8_STRING\) = ($match_qstring)$/{s//title=\1/; h}" \
-		-e '${g; p}'
+function containers-stop {
+  docker stop $(docker ps -a -q)
 }
 
-dell_monitor() {
-	xrandr --newmode "3840x2160_30.00"  338.75  3840 4080 4488 5136  2160 2163 2168 2200 -hsync +vsync
-	xrandr --addmode  DP1 "3840x2160_30.00"
-	xrandr --output eDP1 --auto --primary --output DP1 --mode 3840x2160_30.00 --above eDP1 --rate 30
+function containers-rm {
+  containers-stop
+  docker rm $(docker ps -a -q)
+}
+
+function cd-portal {
+  cd ~/Desktop/git/Portal
+}
+
+function cd-main {
+  cd ~/Desktop/git/MaintenanceReportWebApp
+}
+
+function npm-clean-and-build {
+  rm -rf ./node_modules
+  npm cache clean
+  npm install
+  npm run build
+}
+
+function ssh-backup {
+  ssh -i ~/Desktop/tec-linux-backup.pem app@etgblin1.v-teck.net
+}
+
+function docker-images-clean {
+  docker rmi $(docker images -q --filter "dangling=true")
+}
+
+function gen-keys {
+  openssl genrsa -out key.pem
+  openssl req -new -config gen.conf -key key.pem -out csr.pem
+  openssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem
+  rm csr.pem
+}
+
+function check-proxy-config {
+  docker run -it --rm --name haproxy-syntax-check tectac/proxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 }
