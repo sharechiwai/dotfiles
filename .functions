@@ -375,6 +375,14 @@ function cd-main {
   cd ~/Desktop/git/MaintenanceReportWebApp
 }
 
+function cd-notes {
+	cd ~/Desktop/git/e63ed2915d88b6745c709333566ad6c6
+}
+
+function cd-api-documentation-portal {
+	cd ~/Desktop/git/a5b0fe67ffe56a9366c00361aae237b0
+}
+
 function npm-clean-and-build {
   rm -rf ./node_modules
   npm cache clean
