@@ -163,26 +163,6 @@
 	# `git config --global push.default simple`. See http://git.io/mMah-w.
 	default = simple
 
-# URL shorthands
-[url "git@github.com:"]
-
-	insteadOf = https://github.com/
-	pushInsteadOf = "github:"
-	pushInsteadOf = "git://github.com/"
-
-[url "git://github.com/"]
-
-	insteadOf = "github:"
-
-[url "git@gist.github.com:"]
-
-	insteadOf = "gst:"
-	pushInsteadOf = "gist:"
-	pushInsteadOf = "git://gist.github.com/"
-
-[url "git://gist.github.com/"]
-
-	insteadOf = "gist:"
 [user]
 
 	name = alexhokl
