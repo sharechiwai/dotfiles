@@ -358,17 +358,13 @@ golistdeps(){
 	)
 }
 
-function containers-stop {
+function docker-containers-stop {
   docker stop $(docker ps -a -q)
 }
 
-function containers-rm {
+function docker-containers-rm {
   containers-stop
   docker rm $(docker ps -a -q)
-}
-
-function cd-portal {
-  cd ~/Desktop/git/Portal
 }
 
 function cd-main {
@@ -376,7 +372,11 @@ function cd-main {
 }
 
 function cd-notes {
-	cd ~/Desktop/git/e63ed2915d88b6745c709333566ad6c6
+	cd ~/Desktop/git/notes
+}
+
+function cd-tracker {
+	cd ~/Desktop/git/go-ali-expense-tracker
 }
 
 function cd-api-documentation-portal {
@@ -408,12 +408,12 @@ function ssh-gen-cert {
 	ssh -i "$1".pem "$2"
 }
 
-function ssh-backup {
-  ssh -i ~/Desktop/tec-linux-backup.pem app@etgblin1.v-teck.net
-}
-
 function docker-images-clean {
   docker rmi $(docker images -q --filter "dangling=true")
+}
+
+function docker-volumes-clean {
+	docker volume rm $(docker volume ls -q)
 }
 
 function gen-keys {
