@@ -22,11 +22,12 @@ API_VERSION=v3
 
 DEFAULT_PER_PAGE=100
 
-ignore_repos=( mac-dev-setup universe )
+ignore_repos=( mac-dev-setup )
 
 update_fork(){
 	local forked_repo=$1
 	local upstream_repo=$2
+	local primary_branch=$3
 	local tmpdir=$(mktemp -d)
 
 
@@ -42,13 +43,13 @@ update_fork(){
 	set -x
 	git clone --depth 1 "git@github.com:${forked_repo}.git" "$tmpdir"
 	cd "$tmpdir"
-	git remote add upstream "git@github.com:${upstream_repo}.git"
+	git remote add upstream "https://github.com/${upstream_repo}.git"
 	# just in case
 	git remote set-url --push upstream no_push
-	# fetch the remotes and prune
-	git remote -v update -p
-	git rebase upstream/master
-	git push origin master
+	# fetch upstream master
+	git fetch upstream "${primary_branch}"
+	git reset --hard "upstream/${primary_branch}"
+	git push origin "${primary_branch}"
 	echo "Updated local ${forked_repo} to origin/master"
 	)
 
@@ -72,7 +73,8 @@ main(){
 		if [[ "$fork" == "true" ]]; then
 			local response=$(curl -sSL "${URI}/repos/${fullname}")
 			local upstream_user=$(echo $response | jq --raw-output '.parent.owner.login')
-			update_fork "${fullname}" "${upstream_user}/${repo}"
+			local primary_branch=$(echo $response | jq --raw-output '.default_branch')
+			update_fork "${fullname}" "${upstream_user}/${repo}" "${primary_branch}"
 		fi
 	done
 }

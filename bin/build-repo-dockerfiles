@@ -36,7 +36,7 @@ build_repo_dockerfile(){
 
 	(
 	set -x
-	git clone --depth 1 "git@github.com:${user}/${repo}.git" "$tmpdir"
+	git clone --depth 1 "https://github.com/${user}/${repo}.git" "$tmpdir"
 	cd "$tmpdir"
 	docker build --rm --force-rm -t ${image} .
 	)
@@ -45,7 +45,13 @@ build_repo_dockerfile(){
 	echo "Successfully built ${image}"
 	echo "                       ---                                   "
 
-	docker push --disable-content-trust=false ${image}
+	n=0
+	until [ $n -ge 5 ]; do
+		docker push --disable-content-trust=false ${image} && break
+		echo "Try #$n failed... sleeping for 15 seconds"
+		n=$[$n+1]
+		sleep 15
+	done
 
 	# also push the weather-server image
 	if [[ "${user}/${repo}" == "jfrazelle/weather" ]]; then
@@ -64,7 +70,15 @@ build_repo_dockerfile(){
 		echo "Successfully built ${image}"
 		echo "                       ---                                   "
 
-		docker push --disable-content-trust=false ${image}
+		# try push a few times because notary server sometimes returns 401 for
+		# absolutely no reason
+		n=0
+		until [ $n -ge 5 ]; do
+			docker push --disable-content-trust=false ${image} && break
+			echo "Try #$n failed... sleeping for 15 seconds"
+			n=$[$n+1]
+			sleep 15
+		done
 	fi
 
 
@@ -73,13 +87,24 @@ build_repo_dockerfile(){
 }
 
 repos=(
+jfrazelle/apk-file
+jfrazelle/audit
+jfrazelle/bane
+jfrazelle/battery
 jfrazelle/cliaoke
+jfrazelle/ghb0t
+jfrazelle/magneto
+jfrazelle/netns
+jfrazelle/netscan
 jfrazelle/onion
 jfrazelle/pastebinit
+jfrazelle/pony
+jfrazelle/riddler
 jfrazelle/s3server
 jfrazelle/snippetlib
+jfrazelle/udict
+jfrazelle/upmail
 jfrazelle/weather
-jishi/node-sonos-http-api
 kylemanna/docker-openvpn
 )
 

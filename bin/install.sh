@@ -208,7 +208,7 @@ install_docker() {
 
 # install/update golang from source
 install_golang() {
-	export GO_VERSION=1.6.2
+	export GO_VERSION=1.7.1
 	export GO_SRC=/usr/local/go
 
 	# if we are passing the version
@@ -242,12 +242,14 @@ install_golang() {
 	go get github.com/jfrazelle/bane
 	go get github.com/jfrazelle/battery
 	go get github.com/jfrazelle/cliaoke
+	go get github.com/jfrazelle/ghb0t
 	go get github.com/jfrazelle/magneto
 	go get github.com/jfrazelle/netns
 	go get github.com/jfrazelle/netscan
 	go get github.com/jfrazelle/onion
 	go get github.com/jfrazelle/pastebinit
 	go get github.com/jfrazelle/pony
+	go get github.com/jfrazelle/reg
 	go get github.com/jfrazelle/riddler
 	go get github.com/jfrazelle/udict
 	go get github.com/jfrazelle/weather
@@ -268,7 +270,7 @@ install_golang() {
 	go get github.com/shurcooL/markdownfmt
 	go get github.com/Soulou/curl-unix-socket
 
-	aliases=( cloudflare/cfssl docker/docker kubernetes/kubernetes letsencrypt/boulder opencontainers/runc jfrazelle/binctr jfrazelle/contained.af )
+	aliases=( cloudflare/cfssl docker/docker letsencrypt/boulder opencontainers/runc jfrazelle/binctr jfrazelle/contained.af )
 	for project in "${aliases[@]}"; do
 		owner=$(dirname "$project")
 		repo=$(basename "$project")
@@ -299,20 +301,15 @@ install_golang() {
 			git remote add jfrazelle "https://github.com/jfrazelle/${repo}.git"
 			)
 		fi
-
-		# create the alias
-		ln -snvf "${GOPATH}/src/github.com/${project}" "${HOME}/${repo}"
 	done
 
-	# create symlinks from personal projects to
-	# the ${HOME} directory
-	projectsdir=$GOPATH/src/github.com/jfrazelle
-	base=$(basename "$projectsdir")
-	find "$projectsdir" -maxdepth 1 -not -name "$base" -type d -print0 | while read -d '' -r dir; do
-	base=$(basename "$dir")
-	ln -snvf "$dir" "${HOME}/${base}"
-done
-)
+	# do special things for k8s GOPATH
+	mkdir -p "${GOPATH}/src/k8s.io"
+	git clone "https://github.com/kubernetes/kubernetes.git" "${GOPATH}/src/k8s.io/kubernetes"
+	cd "${GOPATH}/src/k8s.io/kubernetes"
+	git remote set-url --push origin no_push
+	git remote add jfrazelle "https://github.com/jfrazelle/kubernetes.git"
+	)
 }
 
 # install graphics drivers
@@ -439,29 +436,29 @@ get_dotfiles() {
 	sudo systemctl enable i3lock
 	sudo systemctl enable suspend-sedation.service
 
-	cd "/home/$USERNAME"
+	cd "$HOME"
 
 	# install .vim files
-	git clone --recursive git@github.com:jfrazelle/.vim.git "/home/$USERNAME/.vim"
-	ln -snf "/home/$USERNAME/.vim/vimrc" "/home/$USERNAME/.vimrc"
-	sudo ln -snf "/home/$USERNAME/.vim" /root/.vim
-	sudo ln -snf "/home/$USERNAME/.vimrc" /root/.vimrc
+	git clone --recursive git@github.com:jfrazelle/.vim.git "$HOME/.vim"
+	ln -snf "$HOME/.vim/vimrc" "$HOME/.vimrc"
+	sudo ln -snf "$HOME/.vim" /root/.vim
+	sudo ln -snf "$HOME/.vimrc" /root/.vimrc
 
 	# alias vim dotfiles to neovim
 	mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
-	ln -snf "/home/$USERNAME/.vim" $XDG_CONFIG_HOME/nvim
-	ln -snf "/home/$USERNAME/.vimrc" $XDG_CONFIG_HOME/nvim/init.vim
+	ln -snf "$HOME/.vim" $XDG_CONFIG_HOME/nvim
+	ln -snf "$HOME/.vimrc" $XDG_CONFIG_HOME/nvim/init.vim
 	# do the same for root
 	sudo mkdir -p /root/.config
-	sudo ln -snf "/home/$USERNAME/.vim" /root/.config/nvim
-	sudo ln -snf "/home/$USERNAME/.vimrc" /root/.config/nvim/init.vim
+	sudo ln -snf "$HOME/.vim" /root/.config/nvim
+	sudo ln -snf "$HOME/.vimrc" /root/.config/nvim/init.vim
 
 	# update alternatives to neovim
-	sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
+	sudo update-alternatives --install /usr/bin/vi vi $(which nvim) 60
 	sudo update-alternatives --config vi
-	sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+	sudo update-alternatives --install /usr/bin/vim vim $(which nvim) 60
 	sudo update-alternatives --config vim
-	sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+	sudo update-alternatives --install /usr/bin/editor editor $(which nvim) 60
 	sudo update-alternatives --config editor
 
 	mkdir -p ~/Pictures
