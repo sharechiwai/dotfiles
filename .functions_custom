@@ -37,7 +37,11 @@ cd-notes() {
 }
 
 cd-tracker() {
-	cd ~/Desktop/git/go-ali-expense-tracker
+	cd ~/Desktop/git/src/github.com/alexhokl/go-ali-expense-tracker
+}
+
+cd-go() {
+  cd ~/Desktop/git/src/github.com/alexhokl
 }
 
 npm-clean-and-build() {
