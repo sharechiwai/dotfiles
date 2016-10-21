@@ -1,5 +1,5 @@
 # go path
-export GOPATH=$HOME/.go
+export GOPATH=$HOME/Desktop/git
 
 # update path
 export PATH=$PATH:$GOPATH/bin
