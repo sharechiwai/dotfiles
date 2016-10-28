@@ -160,7 +160,7 @@
 
 [difftool "kdiff3"]
 
-	path = /Applications/kdiff3.app/Contents/MacOS/kdiff3
+	path = "D:\\KDiff3\\kdiff3"
 
 [help]
 
@@ -179,7 +179,7 @@
 
 [mergetool "kdiff3"]
 
-	path = /Applications/kdiff3.app/Contents/MacOS/kdiff3
+	path = "D:\\KDiff3\\kdiff3"
 
 [push]
 	# change to maching for machines with older versions of git 1.x.x
@@ -187,18 +187,5 @@
 
 [user]
 
-	name = alexhokl
-	email = alexhokl@gmail.com
-	signingkey = 91A9F98B
-
-[github]
-
-	user = alexhokl
-
-[commit]
-
-	gpgsign = true
-[filter "lfs"]
-	clean = git-lfs clean %f
-	smudge = git-lfs smudge %f
-	required = true
+	name = alexgsc
+	email = alex.ho@gravitysupplychain.com
