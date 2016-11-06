@@ -6,6 +6,11 @@ for file in ~/.{bash_prompt,aliases,functions,functions_custom,path,dockerfunc,e
 done
 unset file
 
+for file in /etc/bash_completion.d/{docker-compose,git-completion.bash}; do
+	[[ -r "$file" ]] && [[ -f "$file" ]] && source "$file"
+done
+unset file
+
 # Case-insensitive globbing (used in pathname expansion)
 shopt -s nocaseglob
 
