@@ -44,6 +44,14 @@ cd-go() {
   cd ~/Desktop/git/src/github.com/alexhokl
 }
 
+go-dev() {
+  docker run --rm --name go-dev -v /Users/alex/Desktop/git/:/go -it golang bash
+}
+
+dotnet-dev() {
+  docker run --rm --name dotnet-dev -v `pwd`:/src -it microsoft/dotnet bash
+}
+
 npm-clean-and-build() {
   rm -rf ./node_modules
   npm cache clean
