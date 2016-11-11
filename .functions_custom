@@ -40,6 +40,7 @@ add-angular-controller() {
   echo "Module files created. Please go on to modify "
   echo "~/app/modules/app.js,"
   echo "~/app/index.html,"
+  echo "~/app/styles/main.scss,"
   echo "~/app/modules/tileBack/tileBack.module.js and "
   echo "~/test/spec/karma.conf.js"
 }
