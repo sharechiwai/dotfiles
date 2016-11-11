@@ -8,6 +8,41 @@ docker-volumes-clean() {
 	docker volume rm $(docker volume ls -q)
 }
 
+add-angular-service() {
+  if [ -z "${1}" ]; then
+		echo "ERROR: no module name specifed."
+		return 1
+	fi
+
+  mkdir -p modules/"$1"/services
+  mkdir -p test/"$1"/services
+  touch modules/"$1"/services/"$1".service.js
+  touch modules/"$1"/"$1".module.js
+  touch test/"$1"/services/"$1".service.spec.js
+}
+
+add-angular-controller() {
+  if [ -z "${1}" ]; then
+		echo "ERROR: no module name specifed."
+		return 1
+	fi
+
+  mkdir -p app/modules/"$1"/controllers
+  mkdir -p app/modules/"$1"/views
+  mkdir -p app/styles/"$1"
+  mkdir -p test/spec/modules/"$1"
+  touch app/modules/"$1"/controllers/"$1".controller.js
+  touch app/modules/"$1"/views/"$1".html
+  touch app/modules/"$1"/"$1".module.js
+  touch app/styles/"$1"/_"$1".scss
+  touch test/spec/modules/"$1"/"$1".controller.spec.js
+
+  echo "Module files created. Please go on to modify "
+  echo "~/app/modules/app.js,"
+  echo "~/app/modules/tileBack/tileBack.module.js and "
+  echo "~/test/spec/karma.conf.js"
+}
+
 gen-keys() {
   openssl genrsa -out key.pem
   openssl req -new -config gen.conf -key key.pem -out csr.pem
