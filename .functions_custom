@@ -65,6 +65,10 @@ docker-containers-rm() {
   docker rm $(docker ps -a -q)
 }
 
+cd-repo() {
+  cd ~/Desktop/git
+}
+
 cd-main() {
   cd ~/Desktop/git/MaintenanceReportWebApp
 }
