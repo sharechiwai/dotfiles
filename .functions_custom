@@ -65,6 +65,14 @@ docker-containers-rm() {
   docker rm $(docker ps -a -q)
 }
 
+cd-home() {
+  TEMP_PWD=`pwd`
+  while ! [ -d .git ]; do
+  cd ..
+  done
+  OLDPWD=$TEMP_PWD
+}
+
 cd-repo() {
   cd ~/Desktop/git
 }
