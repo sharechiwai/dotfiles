@@ -10,6 +10,11 @@ else # OS X `ls`
 	colorflag="-G"
 fi
 
+alias g="git"
+alias gc="gcloud"
+alias d="docker"
+alias compose="docker-compose"
+
 # List all files colorized in long format
 alias l="ls -lF ${colorflag}"
 
