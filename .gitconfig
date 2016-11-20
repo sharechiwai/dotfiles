@@ -191,11 +191,17 @@
 [url "https://bitbucket.com/"]
   insteadOf = "bb:"
 
+[url "https://gist.github.com/"]
+  insteadOf = "gist:"
+
 [user]
 
 	name = alexhokl
 	email = alexhokl@gmail.com
 	signingkey = 332E6E875146971D
+
+[remote "origin"]
+  fetch = +refs/pull/*/head:refs/remotes/origin/pull/*
 
 [github]
 
@@ -204,6 +210,7 @@
 [commit]
 
 	gpgsign = true
+
 [filter "lfs"]
 	clean = git-lfs clean %f
 	smudge = git-lfs smudge %f
