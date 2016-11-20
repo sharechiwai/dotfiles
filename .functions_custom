@@ -46,10 +46,11 @@ add-angular-controller() {
 }
 
 gen-keys() {
-  openssl genrsa -out key.pem
+  openssl genrsa -out key.pem 1024
   openssl req -new -config gen.conf -key key.pem -out csr.pem
   openssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem
-  rm csr.pem
+  cat cert.pem key.pem | tee https_cert.pem
+  rm csr.pem cert.pem key.pem
 }
 
 check-proxy-config() {
