@@ -185,6 +185,12 @@
 	# change to maching for machines with older versions of git 1.x.x
 	default = simple
 
+[url "https://github.com/"]
+  insteadOf = "gh:"
+
+[url "https://bitbucket.com/"]
+  insteadOf = "bb:"
+
 [user]
 
 	name = alexhokl
