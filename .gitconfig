@@ -188,7 +188,7 @@
 [url "https://github.com/"]
   insteadOf = "gh:"
 
-[url "https://bitbucket.com/"]
+[url "https://bitbucket.org/"]
   insteadOf = "bb:"
 
 [url "https://gist.github.com/"]
