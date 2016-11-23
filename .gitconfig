@@ -160,7 +160,7 @@
 
 [difftool "kdiff3"]
 
-	path = "D:\\KDiff3\\kdiff3"
+	path = "C:\\Program Files\\KDiff3\\kdiff3.exe"
 
 [help]
 
@@ -179,7 +179,7 @@
 
 [mergetool "kdiff3"]
 
-	path = "D:\\KDiff3\\kdiff3"
+	path = "C:\\Program Files\\KDiff3\\kdiff3.exe"
 
 [push]
 	# change to maching for machines with older versions of git 1.x.x
@@ -187,5 +187,5 @@
 
 [user]
 
-	name = alexgsc
+	name = Alex Ho
 	email = alex.ho@gravitysupplychain.com
