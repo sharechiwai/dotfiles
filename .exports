@@ -24,6 +24,9 @@ export GDK_SCALE=2
 export GDK_DPI_SCALE=0.5
 export QT_DEVICE_PIXEL_RATIO=2
 
+# XQuartz for Mac
+export DISPLAY_MAC=`ifconfig en0 | grep "inet " | cut -d " " -f2`:0
+
 # turn on go vendoring experiment
 #export GO15VENDOREXPERIMENT=1
 
