@@ -15,6 +15,7 @@ add-angular-directive() {
   fi
 
   mkdir -p app/modules/widgets/"$1"
+  mkdir -p test/spec/modules/widgets/"$1"
 
   touch app/modules/widgets/"$1"/"$1".directive.js
   touch app/modules/widgets/"$1"/"$1".controller.js
