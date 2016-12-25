@@ -8,6 +8,21 @@ docker-volumes-clean() {
 	docker volume rm $(docker volume ls -q)
 }
 
+add-angular-directive() {
+  if [ -z "${1}" ]; then
+    echo "ERROR: no module name specifed."
+    return 1
+  fi
+
+  mkdir -p app/modules/widgets/"$1"
+
+  touch app/modules/widgets/"$1"/"$1".directive.js
+  touch app/modules/widgets/"$1"/"$1".controller.js
+  touch app/modules/widgets/"$1"/"$1".directive.html
+  touch test/spec/modules/widgets/"$1"/"$1".directive.spec.js
+  touch test/spec/modules/widgets/"$1"/"$1".controller.spec.js
+}
+
 add-angular-service() {
   if [ -z "${1}" ]; then
 		echo "ERROR: no module name specifed."
