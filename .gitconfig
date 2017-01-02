@@ -58,7 +58,7 @@
 
 	# Remove branches that have already been merged with master
 	# a.k.a. ‘delete merged’
-	dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+	dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d; git remote -v update -p"
 
 	# List contributors with number of commits
 	contributors = shortlog --summary --numbered
@@ -111,19 +111,12 @@
 	# More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
 	trustctime = false
 	editor = vim
-	legacyheaders = false # >git 1.5
-	quotepath = false
-
-	# http://stackoverflow.com/questions/136178/git-diff-handling-long-lines
-	pager = less -r
-	# if ↑ doesn’t work, try: pager = less -+$LESS -FRX
 
 [color]
 
 	# Use colors in Git commands that are capable of colored output when
 	# outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
 	ui = auto
-	interactive = auto
 
 [color "branch"]
 
@@ -211,7 +204,7 @@
 
 	gpgsign = true
 
-[filter "lfs"]
-	clean = git-lfs clean %f
-	smudge = git-lfs smudge %f
-	required = true
+[http]
+	cookiefile = ~/.gitcookies
+[gpg]
+	program = gpg2

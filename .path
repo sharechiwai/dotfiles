@@ -1,7 +1,10 @@
+#!/bin/sh
+
 # go path
-export GOPATH=$HOME/Desktop/git
+export GOPATH="${HOME}/Desktop/git"
 
 # update path
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$HOME/Applications/mongodb-osx-x86_64-3.2.0/bin
 export PATH=$PATH:/Applications/kdiff3.app/Contents/MacOS/
+export CDPATH=${CDPATH}:$GOPATH/src/github.com:$GOPATH/src/golang.org:$GOPATH/src
