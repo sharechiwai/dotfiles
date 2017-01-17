@@ -29,6 +29,7 @@ fi
 alias gc="gcloud"
 alias d="docker"
 alias compose="docker-compose"
+alias pr="go-bb-pr"
 
 # List all files colorized in long format
 # shellcheck disable=SC2139
