@@ -11,7 +11,7 @@ for file in ~/.{bash_prompt,aliases,functions,functions_custom,path,dockerfunc,e
 done
 unset file
 
-for file in /etc/bash_completion.d/{docker-compose,git-completion.bash}; do
+for file in /etc/bash_completion.d/{docker,docker-compose,git-completion.bash,go-bb-pr-completion.bash}; do
 	[[ -r "$file" ]] && [[ -f "$file" ]] && source "$file"
 done
 unset file
