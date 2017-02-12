@@ -151,10 +151,6 @@
 
 	prompt = false
 
-[difftool "kdiff3"]
-
-	path = /Applications/kdiff3.app/Contents/MacOS/kdiff3
-
 [help]
 
 	# Automatically correct and execute mistyped commands
@@ -170,22 +166,9 @@
 
 	keepBackup = false
 
-[mergetool "kdiff3"]
-
-	path = /Applications/kdiff3.app/Contents/MacOS/kdiff3
-
 [push]
 	# change to maching for machines with older versions of git 1.x.x
 	default = simple
-
-[url "https://github.com/"]
-  insteadOf = "gh:"
-
-[url "https://bitbucket.org/"]
-  insteadOf = "bb:"
-
-[url "https://gist.github.com/"]
-  insteadOf = "gist:"
 
 [user]
 
