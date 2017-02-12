@@ -18,8 +18,9 @@ export LC_ALL="en_HK.UTF-8";
 # Don’t clear the screen after quitting a manual page
 export MANPAGER="less -X";
 
-#export DBUS_SESSION_BUS_ADDRESS
+export DBUS_SESSION_BUS_ADDRESS
 DBUS_SESSION_BUS_ADDRESS=unix:path=/var/run/user/$(id -u)/bus;
+
 export TODOTXT_DEFAULT_ACTION=ls
 
 # hidpi for gtk apps
