@@ -6,7 +6,7 @@ set -e
 
 # get the user that is not root
 # TODO: makes a pretty bad assumption that there is only one other user
-USERNAME=$(find /home/* -maxdepth 0 -printf "%f" -type d)
+USERNAME=$(find /home/* -maxdepth 0 -printf "%f" -type d || echo $USER)
 export DEBIAN_FRONTEND=noninteractive
 
 check_is_sudo() {
@@ -22,6 +22,8 @@ setup_sources() {
 	apt-get update
 	apt-get install -y \
 		apt-transport-https \
+		ca-certificates \
+		curl \
 		--no-install-recommends
 
 	cat <<-EOF > /etc/apt/sources.list
@@ -48,6 +50,10 @@ setup_sources() {
 	deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu wily main
 	deb-src http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu wily main
 
+	# yubico
+	deb http://ppa.launchpad.net/yubico/stable/ubuntu wily main
+	deb-src http://ppa.launchpad.net/yubico/stable/ubuntu wily main
+
 	# tlp: Advanced Linux Power Management
 	# http://linrunner.de/en/tlp/docs/tlp-linux-advanced-power-management.html
 	deb http://repo.linrunner.de/debian sid main
@@ -60,6 +66,18 @@ setup_sources() {
 	deb https://apt.dockerproject.org/repo debian-stretch experimental
 	EOF
 
+	# Add the Cloud SDK distribution URI as a package source
+	echo "deb https://packages.cloud.google.com/apt cloud-sdk-sid main" > /etc/apt/sources.list.d/google-cloud-sdk.list
+
+	# Import the Google Cloud Platform public key
+	curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+	# Add the Google Chrome distribution URI as a package source
+	echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+
+	# Import the Google Chrome public key
+	curl https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+
 	# add docker gpg key
 	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 
@@ -68,6 +86,9 @@ setup_sources() {
 
 	# add the neovim ppa gpg key
 	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
+
+	# add the yubico ppa gpg key
+	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 3653E21064B19D134466702E43D5C49532CBA1A9
 
 	# add the tlp apt-repo gpg key
 	apt-key adv --keyserver pool.sks-keyservers.net --recv-keys CD4E8809
@@ -102,6 +123,9 @@ base() {
 		gcc \
 		git \
 		gnupg \
+		gnupg2 \
+		gnupg-agent \
+		google-cloud-sdk \
 		grep \
 		gzip \
 		hostname \
@@ -120,6 +144,7 @@ base() {
 		net-tools \
 		network-manager \
 		openvpn \
+		pinentry-curses \
 		rxvt-unicode-256color \
 		s3cmd \
 		scdaemon \
@@ -148,7 +173,6 @@ base() {
 
 	install_docker
 	install_scripts
-	install_syncthing
 }
 
 # setup sudo for a user
@@ -222,9 +246,13 @@ install_golang() {
 		sudo rm -rf "$GOPATH"
 	fi
 
-	# subshell because we `cd`
+	# subshell
 	(
 	curl -sSL "https://storage.googleapis.com/golang/go${GO_VERSION}.linux-amd64.tar.gz" | sudo tar -v -C /usr/local -xz
+	local user="$USER"
+	# rebuild stdlib for faster builds
+	sudo chown -R "${user}" /usr/local/go/pkg
+	CGO_ENABLED=0 go install -a -installsuffix cgo std
 	)
 
 	# get commandline tools
@@ -257,19 +285,13 @@ install_golang() {
 
 	go get github.com/axw/gocov/gocov
 	go get github.com/brianredbeard/gpget
-	go get github.com/cloudflare/cfssl/cmd/cfssl
-	go get github.com/cloudflare/cfssl/cmd/cfssljson
 	go get github.com/crosbymichael/gistit
 	go get github.com/crosbymichael/ip-addr
-	go get github.com/cbednarski/hostess/cmd/hostess
 	go get github.com/davecheney/httpstat
-	go get github.com/FiloSottile/gvt
-	go get github.com/FiloSottile/vendorcheck
+	go get github.com/google/gops
 	go get github.com/jstemmer/gotags
 	go get github.com/nsf/gocode
 	go get github.com/rogpeppe/godef
-	go get github.com/shurcooL/git-branches
-	go get github.com/shurcooL/gostatus
 	go get github.com/shurcooL/markdownfmt
 	go get github.com/Soulou/curl-unix-socket
 
@@ -287,16 +309,10 @@ install_golang() {
 			(
 			# clone the repo
 			cd "${GOPATH}/src/github.com/${owner}"
-			if [[ "$project" != "golang/dep" ]]; then
-				git clone "https://github.com/${project}.git"
-			else
-				git clone "git@github.com:${project}.git"
-			fi
+			git clone "https://github.com/${project}.git"
 			# fix the remote path, since our gitconfig will make it git@
 			cd "${GOPATH}/src/github.com/${project}"
-			if [[ "$project" != "golang/dep" ]]; then
-				git remote set-url origin "https://github.com/${project}.git"
-			fi
+			git remote set-url origin "https://github.com/${project}.git"
 			)
 		else
 			echo "found ${project} already in gopath"
@@ -307,21 +323,20 @@ install_golang() {
 			(
 			cd "${GOPATH}/src/github.com/${project}"
 			git remote set-url --push origin no_push
-			if [[ "$project" != "golang/dep" ]]; then
-				git remote add jessfraz "https://github.com/jessfraz/${repo}.git"
-			else
-				git remote add jessfraz "git@github.com:jessfraz/${repo}.git"
-			fi
+			git remote add jessfraz "https://github.com/jessfraz/${repo}.git"
 			)
 		fi
 	done
 
 	# do special things for k8s GOPATH
 	mkdir -p "${GOPATH}/src/k8s.io"
-	git clone "https://github.com/kubernetes/kubernetes.git" "${GOPATH}/src/k8s.io/kubernetes"
-	cd "${GOPATH}/src/k8s.io/kubernetes"
-	git remote set-url --push origin no_push
-	git remote add jessfraz "https://github.com/jessfraz/kubernetes.git"
+	kubes_repos=( community kubernetes release test-infra )
+	for krepo in "${kubes_repos[@]}"; do
+		git clone "https://github.com/kubernetes/${krepo}.git" "${GOPATH}/src/k8s.io/${krepo}"
+		cd "${GOPATH}/src/k8s.io/${krepo}"
+		git remote set-url --push origin no_push
+		git remote add jessfraz "https://github.com/jessfraz/${krepo}.git"
+	done
 	)
 }
 
@@ -349,7 +364,7 @@ install_scripts() {
 	curl -sSL https://asciinema.org/install | sh
 
 	# install speedtest
-	curl -sSL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest_cli.py > /usr/local/bin/speedtest
+	curl -sSL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py  > /usr/local/bin/speedtest
 	chmod +x /usr/local/bin/speedtest
 
 	# install icdiff
@@ -362,13 +377,6 @@ install_scripts() {
 	curl -sSL https://raw.githubusercontent.com/tehmaze/lolcat/master/lolcat > /usr/local/bin/lolcat
 	chmod +x /usr/local/bin/lolcat
 
-	# download syncthing binary
-	if [[ ! -f /usr/local/bin/syncthing ]]; then
-		curl -sSL https://misc.j3ss.co/binaries/syncthing > /usr/local/bin/syncthing
-		chmod +x /usr/local/bin/syncthing
-	fi
-
-	syncthing -upgrade
 
 	local scripts=( go-md2man have light )
 
@@ -380,6 +388,14 @@ install_scripts() {
 
 # install syncthing
 install_syncthing() {
+	# download syncthing binary
+	if [[ ! -f /usr/local/bin/syncthing ]]; then
+		curl -sSL https://misc.j3ss.co/binaries/syncthing > /usr/local/bin/syncthing
+		chmod +x /usr/local/bin/syncthing
+	fi
+
+	syncthing -upgrade
+
 	curl -sSL https://raw.githubusercontent.com/jessfraz/dotfiles/master/etc/systemd/system/syncthing@.service > /etc/systemd/system/syncthing@.service
 
 	systemctl daemon-reload
@@ -406,7 +422,7 @@ install_wifi() {
 
 # install stuff for i3 window manager
 install_wmapps() {
-	local pkgs=( feh i3 i3lock i3status scrot slim neovim )
+	local pkgs=( feh i3 i3lock i3status neovim scrot slim suckless-tools )
 
 	apt-get install -y "${pkgs[@]}" --no-install-recommends
 
