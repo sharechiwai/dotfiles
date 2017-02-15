@@ -194,7 +194,7 @@
 
 	name = alexhokl
 	email = alexhokl@gmail.com
-	signingkey = 332E6E875146971D
+	signingkey = EE510D8CB9F12960
 
 [remote "origin"]
   fetch = +refs/pull/*/head:refs/remotes/origin/pull/*
