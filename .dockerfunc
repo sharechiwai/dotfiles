@@ -86,7 +86,7 @@ audacity(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e QT_DEVICE_PIXEL_RATIO \
 		--device /dev/snd \
 		--group-add audio \
@@ -130,7 +130,7 @@ cheese(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-v "${HOME}/Pictures:/root/Pictures" \
 		--device /dev/video0 \
 		--device /dev/snd \
@@ -159,7 +159,7 @@ chrome(){
 		--memory 3gb \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-v "${HOME}/Downloads:/root/Downloads" \
 		-v "${HOME}/Pictures:/root/Pictures" \
 		-v "${HOME}/Torrents:/root/Torrents" \
@@ -232,7 +232,7 @@ firefox(){
 		-v "${HOME}/Downloads:/root/Downloads" \
 		-v "${HOME}/Pictures:/root/Pictures" \
 		-v "${HOME}/Torrents:/root/Torrents" \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e GDK_SCALE \
 		-e GDK_DPI_SCALE \
 		--device /dev/snd \
@@ -267,7 +267,7 @@ gimp(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-v "${HOME}/Pictures:/root/Pictures" \
 		-v "${HOME}/.gtkrc:/root/.gtkrc" \
 		-e GDK_SCALE \
@@ -338,6 +338,18 @@ kernel_builder(){
 		--name kernel-builder \
 		${DOCKER_REPO_PREFIX}/kernel-builder
 }
+keypassxc(){
+	del_stopped keypassxc
+
+	docker run -d \
+		-v /etc/localtime:/etc/localtime:ro \
+		-v /tmp/.X11-unix:/tmp/.X11-unix \
+		-v /usr/share/X11/xkb:/usr/share/X11/xkb:ro \
+		-e "DISPLAY=unix${DISPLAY}" \
+		-v /etc/machine-id:/etc/machine-id:ro \
+		--name keypassxc \
+		${DOCKER_REPO_PREFIX}/keepassxc
+}
 kvm(){
 	del_stopped kvm
 	relies_on pulseaudio
@@ -349,7 +361,7 @@ kvm(){
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
 		-v /run/libvirt:/var/run/libvirt \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--link pulseaudio:pulseaudio \
 		-e PULSE_SERVER=pulseaudio \
 		--group-add audio \
@@ -363,7 +375,7 @@ libreoffice(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-v "${HOME}/slides:/root/slides" \
 		-e GDK_SCALE \
 		-e GDK_DPI_SCALE \
@@ -450,7 +462,7 @@ neoman(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--device /dev/bus/usb \
 		--device /dev/usb \
 		--name neoman \
@@ -462,7 +474,7 @@ nes(){
 
 	docker run -d \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--device /dev/dri \
 		--device /dev/snd \
 		--name nes \
@@ -501,7 +513,7 @@ notify_osd(){
 		-v /etc \
 		-v /home/user/.dbus \
 		-v /home/user/.cache/dconf \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--name notify_osd \
 		${DOCKER_REPO_PREFIX}/notify-osd
 }
@@ -531,7 +543,7 @@ pivman(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--device /dev/bus/usb \
 		--device /dev/usb \
 		--name pivman \
@@ -604,7 +616,7 @@ remmina(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e GDK_SCALE \
 		-e GDK_DPI_SCALE \
 		-v "${HOME}/.remmina:/root/.remmina" \
@@ -618,7 +630,7 @@ ricochet(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e GDK_SCALE \
 		-e GDK_DPI_SCALE \
 		-e QT_DEVICE_PIXEL_RATIO \
@@ -634,7 +646,7 @@ rstudio(){
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
 		-v "${HOME}/fastly-logs:/root/fastly-logs" \
 		-v /dev/shm:/dev/shm \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e QT_DEVICE_PIXEL_RATIO \
 		--device /dev/dri \
 		--name rstudio \
@@ -656,7 +668,7 @@ scudcloud(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-v /etc/machine-id:/etc/machine-id:ro \
 		-v /var/run/dbus:/var/run/dbus \
 		-v "/var/run/user/$(id -u):/var/run/user/$(id -u)" \
@@ -695,7 +707,7 @@ skype(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--link pulseaudio:pulseaudio \
 		-e PULSE_SERVER=pulseaudio \
 		--security-opt seccomp:unconfined \
@@ -711,7 +723,7 @@ slack(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--device /dev/snd \
 		--device /dev/dri \
 		--device /dev/video0 \
@@ -728,7 +740,7 @@ spotify(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e QT_DEVICE_PIXEL_RATIO \
 		--security-opt seccomp:unconfined \
 		--device /dev/snd \
@@ -757,7 +769,7 @@ steam(){
 		-v /var/run/dbus:/var/run/dbus \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
 		-v "${HOME}/.steam:/home/steam" \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--link pulseaudio:pulseaudio \
 		-e PULSE_SERVER=pulseaudio \
 		--device /dev/dri \
@@ -811,7 +823,7 @@ torbrowser(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e GDK_SCALE \
 		-e GDK_DPI_SCALE \
 		--device /dev/snd \
@@ -827,7 +839,7 @@ tormessenger(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e GDK_SCALE \
 		-e GDK_DPI_SCALE \
 		--device /dev/snd \
@@ -874,8 +886,8 @@ transmission(){
 travis(){
 	docker run -it --rm \
 		-v "${HOME}/.travis:/root/.travis" \
-		-v $(pwd):/repo \
-		--workdir /repo \
+		-v "$(pwd):/usr/src/repo:ro" \
+		--workdir /usr/src/repo \
 		--log-driver none \
 		${DOCKER_REPO_PREFIX}/travis "$@"
 }
@@ -895,7 +907,7 @@ virt_viewer(){
 	docker run -it --rm \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix  \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-v /run/libvirt:/var/run/libvirt \
 		-e PULSE_SERVER=pulseaudio \
 		--group-add audio \
@@ -910,7 +922,7 @@ visualstudio(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix  \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		--name visualstudio \
 		${DOCKER_REPO_PREFIX}/vscode
 }
@@ -921,7 +933,7 @@ vlc(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
 		-e GDK_SCALE \
 		-e GDK_DPI_SCALE \
 		-e QT_DEVICE_PIXEL_RATIO \
@@ -958,7 +970,9 @@ wireshark(){
 	docker run -d \
 		-v /etc/localtime:/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e "DISPLAY=${DISPLAY_MAC}" \
+		-e "DISPLAY=unix${DISPLAY}" \
+		--cap-add NET_RAW \
+		--cap-add NET_ADMIN \
 		--net host \
 		--name wireshark \
 		${DOCKER_REPO_PREFIX}/wireshark

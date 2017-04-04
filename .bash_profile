@@ -3,16 +3,11 @@
 # Load the shell dotfiles, and then some:
 # * ~/.path can be used to extend `$PATH`.
 # * ~/.extra can be used for other settings you don’t want to commit.
-for file in ~/.{bash_prompt,aliases,functions,functions_custom,path,dockerfunc,extra,exports}; do
+for file in ~/.{bash_prompt,aliases,functions,path,dockerfunc,extra,exports}; do
 	if [[ -r "$file" ]] && [[ -f "$file" ]]; then
 		# shellcheck source=/dev/null
 		source "$file"
 	fi
-done
-unset file
-
-for file in /etc/bash_completion.d/{docker,docker-compose,git-completion.bash,go-bb-pr-completion.bash}; do
-	[[ -r "$file" ]] && [[ -f "$file" ]] && source "$file"
 done
 unset file
 
