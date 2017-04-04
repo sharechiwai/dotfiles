@@ -98,6 +98,9 @@ URxvt.boldFont:xft:Inconsolata:style=Bold,pixelsize=27, xft:Symbola:pixelsize=19
 *faceSize:              10
 *bellIsUrgent:          true
 
+!-- window size -- !
+URxvt.geometry: 85x44
+
 !! scroll
 !! do not scroll with output
 URxvt*scrollTtyOutput:      false
