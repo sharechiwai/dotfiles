@@ -110,7 +110,10 @@
 	# Make `git rebase` safer on OS X
 	# More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
 	trustctime = false
-	editor = vim
+	editor = nvim
+
+[include]
+	path = .gitconfig_gpg
 
 [color]
 
@@ -194,7 +197,6 @@
 
 	name = alexhokl
 	email = alexhokl@gmail.com
-	signingkey = 332E6E875146971D
 
 [remote "origin"]
   fetch = +refs/pull/*/head:refs/remotes/origin/pull/*
@@ -203,11 +205,12 @@
 
 	user = alexhokl
 
-[commit]
-
-	gpgsign = true
-
 [http]
 	cookiefile = ~/.gitcookies
-[gpg]
-	program = gpg2
+
+[credential]
+	helper = store --file ~/.git-credentials
+	helper = cache --timeout 30000
+
+[http "https://gopkg.in"]
+	followRedirects = true
