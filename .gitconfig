@@ -112,6 +112,9 @@
 	trustctime = false
 	editor = nvim
 
+[include]
+	path = .gitconfig_gpg
+
 [color]
 
 	# Use colors in Git commands that are capable of colored output when
@@ -194,7 +197,6 @@
 
 	name = alexhokl
 	email = alexhokl@gmail.com
-	signingkey = EE510D8CB9F12960
 
 [remote "origin"]
   fetch = +refs/pull/*/head:refs/remotes/origin/pull/*
@@ -203,24 +205,12 @@
 
 	user = alexhokl
 
-[commit]
-
-	gpgsign = true
-
 [http]
 	cookiefile = ~/.gitcookies
-
-[gpg]
-	program = gpg2
-
-[sendemail]
-	smtpEncryption = tls
-	smtpServer = smtp.gmail.com
-	smtpUser = me@jessfraz.com
-	smtpServerPort = 587
 
 [credential]
 	helper = store --file ~/.git-credentials
 	helper = cache --timeout 30000
+
 [http "https://gopkg.in"]
 	followRedirects = true
