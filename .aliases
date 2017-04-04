@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # debian specific aliases
-alias open='xdg-open'
-alias pbcopy='xclip -selection clipboard'
-alias pbpaste='xclip -selection clipboard -o'
+#alias open='xdg-open'
+#alias pbcopy='xclip -selection clipboard'
+#alias pbpaste='xclip -selection clipboard -o'
 
 # Easier navigation: .., ..., ...., ....., ~ and -
 alias ..="cd .."
@@ -108,7 +108,7 @@ alias afk="i3lock -c 000000"
 alias hosts='sudo vim /etc/hosts'
 
 # copy working directory
-alias cwd='pwd | tr -d "\r\n" | xclip -selection clipboard'
+alias cwd='pwd | tr -d "\r\n" | pbcopy'
 
 # copy file interactive
 #alias cp='cp -i'
