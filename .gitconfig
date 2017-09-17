@@ -194,7 +194,6 @@
 	#insteadOf = "gist:"
 
 [user]
-
 	name = alexhokl
 	email = alexhokl@gmail.com
 
@@ -202,7 +201,6 @@
   fetch = +refs/pull/*/head:refs/remotes/origin/pull/*
 
 [github]
-
 	user = alexhokl
 
 [http]
