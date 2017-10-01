@@ -8,7 +8,6 @@ bin:
 		f=$$(basename $$file); \
 		sudo ln -sf $$file /usr/local/bin/$$f; \
 	done
-	sudo ln -sf $(CURDIR)/bin/browser-exec /usr/local/bin/xdg-open; \
 
 dotfiles:
 	# add aliases for dotfiles
@@ -22,6 +21,7 @@ dotfiles:
 	sudo chmod 600 $(HOME)/.gnupg/gpg.conf;
 	sudo chmod 755 $(HOME)/.gnupg;
 	ln -fn $(CURDIR)/gitignore $(HOME)/.gitignore;
+	git update-index --skip-worktree $(CURDIR)/.gitconfig;
 
 etc:
 	for file in $(shell find $(CURDIR)/etc -type f -not -name ".*.swp"); do \
