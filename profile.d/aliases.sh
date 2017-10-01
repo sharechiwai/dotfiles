@@ -5,6 +5,7 @@
 alias ls='ls -F --color=auto --show-control-chars'
 alias ll='ls -l'
 alias grep='grep --color=auto --exclude=*{.pdb,.dll} '
+alias v='vim'
 
 # Easier navigation: .., ..., ...., ....., ~ and -
 alias ..="cd .."

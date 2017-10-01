@@ -5,7 +5,7 @@
 **To install:**
 
 ```console
-$ make
+$ setup
 ```
 
 This will create symlinks from this repo to your home folder.
