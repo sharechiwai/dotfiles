@@ -113,9 +113,6 @@
 	editor = vim
 	autocrlf = true
 
-[include]
-	path = .gitconfig_gpg
-
 [color]
 
 	# Use colors in Git commands that are capable of colored output when
