@@ -111,6 +111,7 @@
 	# More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
 	trustctime = false
 	editor = vim
+	autocrlf = true
 
 [include]
 	path = .gitconfig_gpg
