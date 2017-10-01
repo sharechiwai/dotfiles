@@ -8,7 +8,7 @@
 # Usage:
 #       clean-registry
 #
-# :authors: Jess Frazelle, @jfrazelle
+# :authors: Jess Frazelle, @jessfraz
 # :date: 20 September 2016
 # :version: 0.0.1
 ##############################################################################
@@ -44,8 +44,9 @@ for repo in "${repos[@]}"; do
 		# remove the current sha
 		shas=( "${shas[@]/$id}" )
 
+		# shellcheck disable=SC2199
 		if [[ "${shas[@]}" != "" ]]; then
-			parallel -j${JOBS} reg -r "${REPO_URL}" delete "${repo}@${ha}:{1}" ::: ${shas[@]}
+			parallel -j"${JOBS}" reg -r "${REPO_URL}" delete "${repo}@${ha}:{1}" ::: "${shas[@]}"
 		fi
 	done
 done

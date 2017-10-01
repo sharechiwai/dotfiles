@@ -1,7 +1,5 @@
 ## dotfiles
 
-[![Travis CI](https://travis-ci.org/jfrazelle/dotfiles.svg?branch=master)](https://travis-ci.org/jfrazelle/dotfiles)
-
 **To install:**
 
 ```console
@@ -40,4 +38,13 @@ export GMAIL_FROM=from-email@you.com
 #### `.vim`
 
 For my `.vimrc` and `.vim` dotfiles see
-[github.com/jfrazelle/.vim](https://github.com/jfrazelle/.vim).
+[github.com/alexhokl/.vim](https://github.com/alexhokl/.vim).
+
+### Tests
+
+The tests use [shellcheck](https://github.com/koalaman/shellcheck). You don't
+need to install anything. They run in a container.
+
+```console
+$ make test
+```

@@ -39,9 +39,11 @@ for_window [class="Code"] floating enable
 for_window [class="Firefox"] floating enable
 for_window [class="Gimp"] floating enable
 for_window [class="google-chrome"] floating enable
+for_window [class="Google-chrome"] floating enable
 for_window [class="Keybase"] floating enable
 for_window [class="Neoman"] floating enable
 for_window [class="NES"] floating enable
+for_window [class="Pidgin"] floating enable
 for_window [class="Portal"] floating enable
 for_window [class="RStudio"] floating enable
 for_window [class="Skype"] floating enable
@@ -85,10 +87,10 @@ bindsym $mod+Shift+Up move up
 # bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+h split h
+bindsym $mod+bar split h
 
 # split in vertical orientation
-bindsym $mod+v split v
+bindsym $mod+minus split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
@@ -111,9 +113,9 @@ bindsym $mod+a focus parent
 #bindsym $mod+d focus child
 
 # switch to workspace
-bindsym $mod+1 workspace 1: irssi
-bindsym $mod+2 workspace 2: mutt
-bindsym $mod+3 workspace 3: www
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
 bindsym $mod+4 workspace 4
 bindsym $mod+5 workspace 5
 bindsym $mod+6 workspace 6
@@ -123,9 +125,9 @@ bindsym $mod+9 workspace 9
 bindsym $mod+0 workspace 10
 
 # move focused container to workspace
-bindsym $mod+Shift+1 move container to workspace 1: irssi
-bindsym $mod+Shift+2 move container to workspace 2: mutt
-bindsym $mod+Shift+3 move container to workspace 3: www
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
 bindsym $mod+Shift+4 move container to workspace 4
 bindsym $mod+Shift+5 move container to workspace 5
 bindsym $mod+Shift+6 move container to workspace 6
@@ -146,11 +148,11 @@ bindsym XF86MonBrightnessDown exec sudo light -U 5 # decrease screen brightness
 
 # Screenshots
 # Screenshot fullscreen
-bindsym Print exec "scrot -q 100 ${HOME}'/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S_$wx$h.png' -e 's3cmd put -P $f s3://s3.j3ss.co/screenshots/ && echo https://s3.j3ss.co/screenshots/$n | xclip -i -selection clipboard'"
+bindsym Print exec "scrot -q 100 ${HOME}'/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S_$wx$h.png' -e ${HOME}'/google-cloud-sdk/bin/gsutil cp -a public-read $f gs://misc.j3ss.co/screenshots/ && echo https://misc.j3ss.co/screenshots/$n | xclip -i -selection clipboard'"
 # Screenshot with selection
-bindsym $mod+Print exec "sleep 0.2; scrot -q 100 -s ${HOME}'/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S_$wx$h.png' -e 's3cmd put -P $f s3://s3.j3ss.co/screenshots/ && echo https://s3.j3ss.co/screenshots/$n | xclip -i -selection clipboard'"
+bindsym $mod+Print exec "sleep 0.4; scrot -q 100 -s ${HOME}'/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S_$wx$h.png' -e ${HOME}'/google-cloud-sdk/bin/gsutil cp -a public-read $f gs://misc.j3ss.co/screenshots/ && echo https://misc.j3ss.co/screenshots/$n | xclip -i -selection clipboard'"
 # Screenshot current focused window
-bindsym Shift+Print exec "scrot -q 100 -u ${HOME}'/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S_$wx$h.png' -e 's3cmd put -P $f s3://s3.j3ss.co/screenshots/ && echo https://s3.j3ss.co/screenshots/$n | xclip -i -selection clipboard'"
+bindsym Shift+Print exec "scrot -q 100 -u ${HOME}'/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S_$wx$h.png' -e ${HOME}'/google-cloud-sdk/bin/gsutil cp -a public-read $f gs://misc.j3ss.co/screenshots/ && echo https://misc.j3ss.co/screenshots/$n | xclip -i -selection clipboard'"
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -195,7 +197,7 @@ bar {
 # set background
 # use the same background as slim (login manager)
 # this file is an alias to something in /home/jessie/Pictures
-exec --no-startup-id feh --bg-fill /usr/share/slim/themes/default/background.jpg
+exec --no-startup-id feh --bg-fill ${HOME}/Pictures/central-park2.jpg
 
 # run the merge for good colors
 exec xrdb -merge $HOME/.Xresources
