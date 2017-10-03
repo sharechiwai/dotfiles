@@ -16,6 +16,7 @@ prompt_git() {
 	local ahead=0;
 	local behind=0;
 	local branchName='';
+	local remote_commit='';
 
 	# Check if the current directory is in a Git repository.
 	if [ "$(git rev-parse --is-inside-work-tree &>/dev/null; echo "${?}")" == '0' ]; then
@@ -59,16 +60,22 @@ prompt_git() {
 		# check if the current directory is in .git before running git checks
 		if [ "$(git rev-parse --is-inside-git-dir 2> /dev/null)" == 'false' ]; then
 
-			# Check if it is ahead of or behind origin
-			ahead=$(git rev-list --count origin/${branchName}.. 2>/dev/null);
-			behind=$(git rev-list --count ..origin/${branchName} 2>/dev/null);
+			remote_commit=$(git ls-remote --exit-code . origin/${branchName} 2>/dev/null)
+			if [ -n "${remote_commit}" ]; then
 
-			if [ $ahead -ne 0 ] && [ $behind -ne 0 ]; then
-				branchName+=" diverged ${behind}< ${ahead}>";
-			elif [ $behind -ne 0 ]; then
-				branchName+=" ${behind}<origin";
-			elif [ $ahead -ne 0 ]; then
-				branchName+=" ${ahead}>origin";
+				# Check if it is ahead of or behind origin
+				ahead=$(git rev-list --count origin/${branchName}.. 2>/dev/null);
+				behind=$(git rev-list --count ..origin/${branchName} 2>/dev/null);
+
+				if [ $ahead -ne 0 ] && [ $behind -ne 0 ]; then
+					branchName+=" diverged ${behind}< ${ahead}>";
+				elif [ $behind -ne 0 ]; then
+					branchName+=" ${behind}<origin";
+				elif [ $ahead -ne 0 ]; then
+					branchName+=" ${ahead}>origin";
+				fi;
+			else
+				branchName+=" (local-only)"
 			fi;
 
 		fi;
