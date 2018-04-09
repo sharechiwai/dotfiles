@@ -101,6 +101,10 @@ if [[ -d /etc/bash_completion.d/ ]]; then
 	done
 fi
 
+if [[ -f "${HOME}/.bash_profile" ]]; then
+	# shellcheck source=/dev/null
+	source "${HOME}/.bash_profile"
+fi
 # use a tty for gpg
 # solves error: "gpg: signing failed: Inappropriate ioctl for device"
 GPG_TTY=$(tty)
