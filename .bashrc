@@ -18,7 +18,7 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+[ -x /usr/bin/lesspipe ] && export LESSOPEN="|lesspipe %s"
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -56,7 +56,7 @@ unset color_prompt force_color_prompt
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 	xterm*|rxvt*)
-		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+		PS1="\\[\\e]0;${debian_chroot:+($debian_chroot)}\\u@\\h: \\w\\a\\]$PS1"
 		;;
 	*)
 		;;
@@ -89,16 +89,16 @@ if ! shopt -oq posix; then
 	elif [[ -f /etc/bash_completion ]]; then
 		# shellcheck source=/dev/null
 		. /etc/bash_completion
+	elif [[ -f /usr/local/etc/bash_completion ]]; then
+		# shellcheck source=/dev/null
+		. /usr/local/etc/bash_completion
 	fi
 fi
-#for file in /etc/bash_completion.d/* ; do
-	## shellcheck source=/dev/null
-	#source "$file"
-#done
-
-if [[ -f "${HOME}/.bash_profile" ]]; then
-	# shellcheck source=/dev/null
-	source "${HOME}/.bash_profile"
+if [[ -d /etc/bash_completion.d/ ]]; then
+	for file in /etc/bash_completion.d/* ; do
+		# shellcheck source=/dev/null
+		source "$file"
+	done
 fi
 
 # use a tty for gpg
@@ -113,7 +113,11 @@ fi
 # Set SSH to use gpg-agent
 unset SSH_AGENT_PID
 if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
-	export SSH_AUTH_SOCK="/run/user/$UID/gnupg/S.gpg-agent.ssh"
+	if [[ -S "${HOME}/.gnupg/S.gpg-agent.ssh" ]]; then
+		export SSH_AUTH_SOCK="${HOME}/.gnupg/S.gpg-agent.ssh"
+	else
+		export SSH_AUTH_SOCK="/run/user/$UID/gnupg/S.gpg-agent.ssh"
+	fi
 fi
 # add alias for ssh to update the tty
 alias ssh="gpg-connect-agent updatestartuptty /bye >/dev/null; ssh"

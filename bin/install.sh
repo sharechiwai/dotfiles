@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o pipefail
 
 # install.sh
 #	This script installs my basic setup for a debian laptop
@@ -9,8 +10,17 @@ export DEBIAN_FRONTEND=noninteractive
 # Choose a user account to use for this installation
 get_user() {
 	if [ -z "${TARGET_USER-}" ]; then
+		mapfile -t options < <(find /home/* -maxdepth 0 -printf "%f\\n" -type d)
+		# if there is only one option just use that user
+		if [ "${#options[@]}" -eq "1" ]; then
+			readonly TARGET_USER="${options[0]}"
+			echo "Using user account: ${TARGET_USER}"
+			return
+		fi
+
+		# iterate through the user options and print them
 		PS3='Which user account should be used? '
-		options=($(find /home/* -maxdepth 0 -printf "%f\n" -type d))
+
 		select opt in "${options[@]}"; do
 			readonly TARGET_USER=$opt
 			break
@@ -27,12 +37,13 @@ check_is_sudo() {
 
 
 setup_sources_min() {
-	apt-get update
-	apt-get install -y \
+	apt update
+	apt install -y \
 		apt-transport-https \
 		ca-certificates \
 		curl \
 		dirmngr \
+		lsb-release \
 		--no-install-recommends
 
 	# hack for latest git (don't judge)
@@ -53,7 +64,7 @@ setup_sources_min() {
 	# add the neovim ppa gpg key
 	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
 
-	# turn off translations, speed up apt-get update
+	# turn off translations, speed up apt update
 	mkdir -p /etc/apt/apt.conf.d
 	echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99translations
 }
@@ -105,6 +116,12 @@ setup_sources() {
 	# Import the Google Cloud Platform public key
 	curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
+	# Add the Cloud SDK for Azure
+	echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" > /etc/apt/sources.list.d/azure-cloud-sdk.list
+
+	# Add the Azure Cloud public key
+	apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
+
 	# Add the Google Chrome distribution URI as a package source
 	echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
 
@@ -122,10 +139,10 @@ setup_sources() {
 }
 
 base_min() {
-	apt-get update
-	apt-get -y upgrade
+	apt update
+	apt -y upgrade
 
-	apt-get install -y \
+	apt install -y \
 		adduser \
 		automake \
 		bash-completion \
@@ -150,6 +167,7 @@ base_min() {
 		jq \
 		less \
 		libc6-dev \
+		libimobiledevice6 \
 		locales \
 		lsof \
 		make \
@@ -166,6 +184,7 @@ base_min() {
 		tar \
 		tree \
 		tzdata \
+		usbmuxd \
 		unzip \
 		xclip \
 		xcompmgr \
@@ -173,9 +192,9 @@ base_min() {
 		zip \
 		--no-install-recommends
 
-	apt-get autoremove
-	apt-get autoclean
-	apt-get clean
+	apt autoremove
+	apt autoclean
+	apt clean
 
 	install_scripts
 }
@@ -185,12 +204,13 @@ base_min() {
 base() {
 	base_min;
 
-	apt-get update
-	apt-get -y upgrade
+	apt update
+	apt -y upgrade
 
-	apt-get install -y \
+	apt install -y \
 		alsa-utils \
 		apparmor \
+		azure-cli \
 		bridge-utils \
 		cgroupfs-mount \
 		google-cloud-sdk \
@@ -203,13 +223,13 @@ base() {
 		--no-install-recommends
 
 	# install tlp with recommends
-	apt-get install -y tlp tlp-rdw
+	apt install -y tlp tlp-rdw
 
 	setup_sudo
 
-	apt-get autoremove
-	apt-get autoclean
-	apt-get clean
+	apt autoremove
+	apt autoclean
+	apt clean
 
 	install_docker
 }
@@ -232,7 +252,7 @@ setup_sudo() {
 
 	# add go path to secure path
 	{ \
-		echo -e 'Defaults	secure_path="/usr/local/go/bin:/home/jessie/.go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'; \
+		echo -e "Defaults	secure_path=\"/usr/local/go/bin:/home/${USERNAME}/.go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\""; \
 		echo -e 'Defaults	env_keep += "ftp_proxy http_proxy https_proxy no_proxy GOPATH EDITOR"'; \
 		echo -e "${TARGET_USER} ALL=(ALL) NOPASSWD:ALL"; \
 		echo -e "${TARGET_USER} ALL=NOPASSWD: /sbin/ifconfig, /sbin/ifup, /sbin/ifdown, /sbin/ifquery"; \
@@ -242,7 +262,7 @@ setup_sudo() {
 	# that way things are removed on reboot
 	# i like things clean but you may not want this
 	mkdir -p "/home/$TARGET_USER/Downloads"
-	echo -e "\n# tmpfs for downloads\ntmpfs\t/home/${TARGET_USER}/Downloads\ttmpfs\tnodev,nosuid,size=2G\t0\t0" >> /etc/fstab
+	echo -e "\\n# tmpfs for downloads\\ntmpfs\\t/home/${TARGET_USER}/Downloads\\ttmpfs\\tnodev,nosuid,size=2G\\t0\\t0" >> /etc/fstab
 }
 
 # installs docker master
@@ -252,9 +272,27 @@ install_docker() {
 	sudo groupadd docker
 	sudo gpasswd -a "$TARGET_USER" docker
 
+	# Include contributed completions
+	mkdir -p /etc/bash_completion.d
+	curl -sSL -o /etc/bash_completion.d/docker https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker
 
-	curl -sSL https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz | tar -xvz \
-		-C /usr/local/bin --strip-components 1
+
+	# get the binary
+	local tmp_tar=/tmp/docker.tgz
+	local binary_uri="https://download.docker.com/linux/static/edge/x86_64"
+	local docker_version
+	docker_version=$(curl -sSL "https://api.github.com/repos/docker/docker-ce/releases/latest" | jq --raw-output .tag_name)
+	docker_version=${docker_version#v}
+	# local docker_sha256
+	# docker_sha256=$(curl -sSL "${binary_uri}/docker-${docker_version}.tgz.sha256" | awk '{print $1}')
+	(
+	set -x
+	curl -fSL "${binary_uri}/docker-${docker_version}.tgz" -o "${tmp_tar}"
+	# echo "${docker_sha256} ${tmp_tar}" | sha256sum -c -
+	tar -C /usr/local/bin --strip-components 1 -xzvf "${tmp_tar}"
+	rm "${tmp_tar}"
+	docker -v
+	)
 	chmod +x /usr/local/bin/docker*
 
 	curl -sSL https://raw.githubusercontent.com/jessfraz/dotfiles/master/etc/systemd/system/docker.service > /etc/systemd/system/docker.service
@@ -264,19 +302,20 @@ install_docker() {
 	systemctl enable docker
 
 	# update grub with docker configs and power-saving items
-	sed -i.bak 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1 pcie_aspm=force apparmor=1 security=apparmor"/g' /etc/default/grub
+	sed -i.bak 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1 apparmor=1 security=apparmor page_poison=1 slab_nomerge vsyscall=none"/g' /etc/default/grub
 	echo "Docker has been installed. If you want memory management & swap"
 	echo "run update-grub & reboot"
 }
 
 # install/update golang from source
 install_golang() {
-	export GO_VERSION=1.9
+	export GO_VERSION
+	GO_VERSION=$(curl -sSL "https://golang.org/VERSION?m=text")
 	export GO_SRC=/usr/local/go
 
 	# if we are passing the version
 	if [[ ! -z "$1" ]]; then
-		export GO_VERSION=$1
+		GO_VERSION=$1
 	fi
 
 	# purge old src
@@ -285,9 +324,12 @@ install_golang() {
 		sudo rm -rf "$GOPATH"
 	fi
 
+	GO_VERSION=${GO_VERSION#go}
+
 	# subshell
 	(
-	curl -sSL "https://storage.googleapis.com/golang/go${GO_VERSION}.linux-amd64.tar.gz" | sudo tar -v -C /usr/local -xz
+	kernel=$(uname -s | tr '[:upper:]' '[:lower:]')
+	curl -sSL "https://storage.googleapis.com/golang/go${GO_VERSION}.${kernel}-amd64.tar.gz" | sudo tar -v -C /usr/local -xz
 	local user="$USER"
 	# rebuild stdlib for faster builds
 	sudo chown -R "${user}" /usr/local/go/pkg
@@ -305,29 +347,34 @@ install_golang() {
 	go get golang.org/x/tools/cmd/gorename
 	go get golang.org/x/tools/cmd/guru
 
-	go get github.com/jessfraz/amicontained
-	go get github.com/jessfraz/apk-file
-	go get github.com/jessfraz/audit
-	go get github.com/jessfraz/certok
+	go get github.com/genuinetools/amicontained
+	go get github.com/genuinetools/apk-file
+	go get github.com/genuinetools/audit
+	go get github.com/genuinetools/certok
+	go get github.com/genuinetools/img
+	go get github.com/genuinetools/netns
+	go get github.com/genuinetools/pepper
+	go get github.com/genuinetools/reg
+	go get github.com/genuinetools/udict
+	go get github.com/genuinetools/weather
+
 	go get github.com/jessfraz/cliaoke
-	go get github.com/jessfraz/ghb0t
 	go get github.com/jessfraz/junk/sembump
-	go get github.com/jessfraz/netns
 	go get github.com/jessfraz/pastebinit
-	go get github.com/jessfraz/pepper
-	go get github.com/jessfraz/reg
-	go get github.com/jessfraz/udict
-	go get github.com/jessfraz/weather
+	go get github.com/jessfraz/tdash
 
 	go get github.com/axw/gocov/gocov
 	go get github.com/crosbymichael/gistit
 	go get github.com/davecheney/httpstat
+	go get honnef.co/go/tools/cmd/staticcheck
 	go get github.com/google/gops
+
+	# Tools for vimgo.
 	go get github.com/jstemmer/gotags
 	go get github.com/nsf/gocode
 	go get github.com/rogpeppe/godef
 
-	aliases=( docker/docker opencontainers/runc jessfraz/binctr jessfraz/contained.af )
+	aliases=( Azure/acs-engine genuinetools/contained.af genuinetools/binctr docker/docker moby/buildkit opencontainers/runc )
 	for project in "${aliases[@]}"; do
 		owner=$(dirname "$project")
 		repo=$(basename "$project")
@@ -399,7 +446,7 @@ install_graphics() {
 			;;
 	esac
 
-	apt-get install -y "${pkgs[@]}" --no-install-recommends
+	apt install -y "${pkgs[@]}" --no-install-recommends
 }
 
 # install custom scripts/binaries
@@ -455,7 +502,7 @@ install_wifi() {
 	if [[ $system == "broadcom" ]]; then
 		local pkg="broadcom-sta-dkms"
 
-		apt-get install -y "$pkg" --no-install-recommends
+		apt install -y "$pkg" --no-install-recommends
 	else
 		update-iwlwifi
 	fi
@@ -463,9 +510,9 @@ install_wifi() {
 
 # install stuff for i3 window manager
 install_wmapps() {
-	local pkgs=( feh i3 i3lock i3status scrot slim suckless-tools )
+	local pkgs=( feh i3 i3lock i3status scrot suckless-tools )
 
-	apt-get install -y "${pkgs[@]}" --no-install-recommends
+	apt install -y "${pkgs[@]}" --no-install-recommends
 
 	# update clickpad settings
 	mkdir -p /etc/X11/xorg.conf.d/
@@ -507,7 +554,7 @@ get_dotfiles() {
 	sudo systemctl enable suspend-sedation.service
 
 	cd "$HOME"
-	mkdir -p ~/Pictures
+	mkdir -p ~/Pictures/Screenshots
 	mkdir -p ~/Torrents
 	)
 
@@ -543,9 +590,9 @@ install_vim() {
 	sudo update-alternatives --config editor
 
 	# install things needed for deoplete for vim
-	sudo apt-get update
+	sudo apt update
 
-	sudo apt-get install -y \
+	sudo apt install -y \
 		python3-pip \
 		python3-setuptools \
 		--no-install-recommends
@@ -566,8 +613,8 @@ install_virtualbox() {
 		jessie_sources=/etc/apt/sources.list.d/jessie.list
 		echo "deb http://httpredir.debian.org/debian jessie main contrib non-free" > "$jessie_sources"
 
-		apt-get update
-		apt-get install -y -t jessie libvpx1 \
+		apt update
+		apt install -y -t jessie libvpx1 \
 			--no-install-recommends
 
 		# cleanup the file that we used to install things from jessie
@@ -578,9 +625,9 @@ install_virtualbox() {
 
 	curl -sSL https://www.virtualbox.org/download/oracle_vbox.asc | apt-key add -
 
-	apt-get update
-	apt-get install -y \
-		virtualbox-5.0
+	apt update
+	apt install -y \
+		virtualbox-5.0 \
 	--no-install-recommends
 }
 
@@ -615,7 +662,7 @@ install_vagrant() {
 
 
 usage() {
-	echo -e "install.sh\n\tThis script installs my basic setup for a debian laptop\n"
+	echo -e "install.sh\\n\\tThis script installs my basic setup for a debian laptop\\n"
 	echo "Usage:"
 	echo "  base                                - setup sources & install base pkgs"
 	echo "  basemin                             - setup sources & install base min pkgs"
