@@ -89,22 +89,18 @@ if ! shopt -oq posix; then
 	elif [[ -f /etc/bash_completion ]]; then
 		# shellcheck source=/dev/null
 		. /etc/bash_completion
-	elif [[ -f /usr/local/etc/bash_completion ]]; then
-		# shellcheck source=/dev/null
-		. /usr/local/etc/bash_completion
 	fi
 fi
-if [[ -d /etc/bash_completion.d/ ]]; then
-	for file in /etc/bash_completion.d/* ; do
-		# shellcheck source=/dev/null
-		source "$file"
-	done
-fi
+for file in /etc/bash_completion.d/* ; do
+	# shellcheck source=/dev/null
+	source "$file"
+done
 
 if [[ -f "${HOME}/.bash_profile" ]]; then
 	# shellcheck source=/dev/null
 	source "${HOME}/.bash_profile"
 fi
+
 # use a tty for gpg
 # solves error: "gpg: signing failed: Inappropriate ioctl for device"
 GPG_TTY=$(tty)

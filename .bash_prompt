@@ -89,7 +89,7 @@ prompt_git() {
 }
 
 cloud=""
-if [[ -f /proc/cpuinfo ]] && grep -q "^flags.* hypervisor" /proc/cpuinfo && [[ ! -d "/mnt/c/Windows/" ]]; then
+if grep -q "^flags.* hypervisor" /proc/cpuinfo && [[ ! -d "/mnt/c/Windows/" ]]; then
 	cloud="☁️ "
 fi
 
