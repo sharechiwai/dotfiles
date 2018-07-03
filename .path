@@ -6,5 +6,5 @@ export GOPATH="${HOME}/Desktop/git"
 # update path
 export PATH=$PATH:$GOPATH/bin
 export PATH=/usr/local/opt/gnu-sed/libexec/gnubin:$PATH
-export CDPATH=${CDPATH}:$GOPATH/src/github.com:$GOPATH/src/golang.org:$GOPATH/src:$HOME/.rbenv/bin:$HOME/.rbenv/versions/2.4.2/bin
+export CDPATH=${CDPATH}:$GOPATH/src/github.com:$GOPATH/src/golang.org:$GOPATH/src:$HOME/.rbenv/bin:$HOME/.rbenv/versions/2.4.2/bin:$GOPATH/src/github.com/alexhokl
 
