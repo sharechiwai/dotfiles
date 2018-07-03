@@ -42,3 +42,5 @@ done
 
 # print a fortune when the terminal opens
 #fortune -a -s | lolcat
+
+. $(brew --prefix bash-completion)/etc/bash_completion
