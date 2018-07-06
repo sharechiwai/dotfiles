@@ -179,6 +179,9 @@ bindsym Shift+Print exec "scrot -q 100 -u ${HOME}'/Pictures/%Y-%m-%d-%H-%M-%S_$w
 # Screenshot current focused window, sway
 #bindsym Shift+Print exec "swaygrab --focused ${HOME}/Pictures/Screenshots/$(date '+%Y-%m-%d-%H-%M-%S').png"
 
+# Video capture left half of the screen for 20 seconds
+bindsym $mod+Shift+Print exec "byzanz-record -d 20 -c -h 0 -x 0 -y 0 -w 3840 -h 2160 ${HOME}/Pictures/screencast-$(date +%Y-%m-%d-%H-%M).gif"
+
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
