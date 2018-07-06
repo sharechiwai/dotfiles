@@ -99,6 +99,10 @@ URxvt.boldFont: xft:Inconsolata:style=bold:pixelsize=27:antialias=true:hinting=f
 !!*faceSize:              10
 *bellIsUrgent:          true
 
+!-- transparency -- !
+URxvt.transparent: true
+URxvt.shading: 20
+
 !-- window size -- !
 URxvt.geometry: 85x44
 
