@@ -116,8 +116,6 @@
 	# Make `git rebase` safer on OS X
 	# More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
 	trustctime = false
-	editor = vim
-	autocrlf = true
 
 [color]
 
@@ -210,8 +208,8 @@
 [http]
 	cookiefile = ~/.gitcookies
 
-[credential]
-	helper = manager
-
 [http "https://gopkg.in"]
 	followRedirects = true
+
+[include]
+	path = ~/.gitconfig_linux
