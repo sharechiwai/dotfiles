@@ -2,7 +2,7 @@
   signingkey = EE510D8CB9F12960
 
 [commit]
-  gpgsign = true
+  gpgsign = false
 
 [gpg]
   program = gpg2
