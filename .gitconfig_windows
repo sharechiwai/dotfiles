@@ -2,9 +2,6 @@
   editor = code
   autocrlf = true
 
-[user]
-  signingkey = EE510D8CB9F12960
-
 [commit]
   gpgsign = false
 
@@ -12,4 +9,4 @@
   program = gpg2
 
 [credential]
-	helper = manager
+  helper = manager
